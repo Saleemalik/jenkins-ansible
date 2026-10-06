@@ -1,0 +1,55 @@
+---
+# tasks file for roles/jenkins
+- name: Update apt package cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Install Java and Jenkins prerequisites
+  ansible.builtin.apt:
+    name: "{{ jenkins_java_packages }}"
+    state: present
+
+- name: Ensure APT keyrings directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Download Jenkins repository signing key
+  ansible.builtin.get_url:
+    url: "{{ jenkins_key_url }}"
+    dest: "{{ jenkins_keyring_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Configure Jenkins LTS repository
+  ansible.builtin.apt_repository:
+    repo: "{{ jenkins_repo }}"
+    filename: jenkins
+    state: present
+
+- name: Update apt cache after adding Jenkins repository
+  ansible.builtin.apt:
+    update_cache: true
+    
+- name: Install Jenkins
+  ansible.builtin.apt:
+    name: "{{ jenkins_package }}"
+    state: present
+
+- name: Enable and start Jenkins
+  ansible.builtin.systemd:
+    name: "{{ jenkins_service }}"
+    enabled: true
+    state: started
+
+- name: Wait for Jenkins port
+  ansible.builtin.wait_for:
+    host: 127.0.0.1
+    port: "{{ jenkins_port }}"
+    delay: 5
+    timeout: 60
