@@ -1,0 +1,13 @@
+---
+# defaults file for roles/postgresql
+postgresql_packages:
+  - postgresql
+  - postgresql-contrib
+  - libpq-dev
+  - python3-psycopg2
+  - acl
+  
+postgresql_service: postgresql
+
+ci_database_name: inventory_ci
+ci_database_user: inventory_ci
