@@ -1,0 +1,13 @@
+# Ansible Vault
+group_vars/jenkins_servers/vault.yml
+
+# Environment files
+.env
+*.env
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+venv/
