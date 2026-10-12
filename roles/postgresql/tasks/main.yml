@@ -31,6 +31,7 @@
   community.postgresql.postgresql_user:
     name: "{{ ci_database_user }}"
     password: "{{ ci_database_password }}"
+    role_attr_flags: CREATEDB
     state: present
 
 - name: Create PostgreSQL CI database
