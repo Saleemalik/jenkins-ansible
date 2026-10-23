@@ -1,0 +1,24 @@
+
+---
+- name: Ensure Jenkins SSH directory exists
+  ansible.builtin.file:
+    path: /var/lib/jenkins/.ssh
+    state: directory
+    owner: jenkins
+    group: jenkins
+    mode: '0700'
+
+- name: Add verified GitHub Ed25519 host key
+  ansible.builtin.known_hosts:
+    path: /var/lib/jenkins/.ssh/known_hosts
+    name: github.com
+    key: "github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl"
+    state: present
+  become: true
+
+- name: Set Jenkins known_hosts ownership and permissions
+  ansible.builtin.file:
+    path: /var/lib/jenkins/.ssh/known_hosts
+    owner: jenkins
+    group: jenkins
+    mode: '0600'
