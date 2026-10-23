@@ -1,0 +1,11 @@
+
+---
+- name: Update apt package cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Install CI build and Python dependencies
+  ansible.builtin.apt:
+    name: "{{ ci_dependency_packages }}"
+    state: present

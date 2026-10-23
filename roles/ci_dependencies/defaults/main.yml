@@ -1,0 +1,12 @@
+---
+ci_dependency_packages:
+  - git
+  - curl
+  - ca-certificates
+  - build-essential
+  - python3-venv
+  - python3-dev
+  - libpq-dev
+  - libjpeg-dev
+  - zlib1g-dev
+  - libmagic1

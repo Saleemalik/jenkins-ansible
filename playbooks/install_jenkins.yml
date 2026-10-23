@@ -7,3 +7,4 @@
     - jenkins
     - postgresql
     - github_ssh
+    - ci_dependencies
