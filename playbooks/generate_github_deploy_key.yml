@@ -5,15 +5,16 @@
   gather_facts: true
 
   vars:
-    deploy_key_path: "{{ ansible_env.HOME }}/.ssh/inventory_system_deploy_key"
+    deploy_key_path: "{{ ansible_facts['env']['HOME'] }}/.ssh/inventory_system_deploy_key"
     deploy_public_key_path: "{{ deploy_key_path }}.pub"
+    deploy_key_owner: "{{ ansible_facts['user_id'] }}"
 
   tasks:
     - name: Ensure SSH directory exists
       ansible.builtin.file:
-        path: "{{ ansible_env.HOME }}/.ssh"
+        path: "{{ ansible_facts['env']['HOME'] }}/.ssh"
         state: directory
-        owner: "{{ ansible_user_id }}"
+        owner: "{{ deploy_key_owner }}"
         mode: '0700'
 
     - name: Check whether private key exists
@@ -52,13 +53,13 @@
     - name: Set private key permissions
       ansible.builtin.file:
         path: "{{ deploy_key_path }}"
-        owner: "{{ ansible_user_id }}"
+        owner: "{{ deploy_key_owner }}"
         mode: '0600'
 
     - name: Set public key permissions
       ansible.builtin.file:
         path: "{{ deploy_public_key_path }}"
-        owner: "{{ ansible_user_id }}"
+        owner: "{{ deploy_key_owner }}"
         mode: '0644'
 
     - name: Read public key
