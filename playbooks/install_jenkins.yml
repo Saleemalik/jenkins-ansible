@@ -8,3 +8,4 @@
     - postgresql
     - github_ssh
     - ci_dependencies
+    - nodejs
