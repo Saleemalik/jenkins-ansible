@@ -1,0 +1,74 @@
+
+---
+- name: Prepare GitHub deploy key on Jenkins server
+  hosts: jenkins_servers
+  gather_facts: true
+
+  vars:
+    deploy_key_path: "{{ ansible_env.HOME }}/.ssh/inventory_system_deploy_key"
+    deploy_public_key_path: "{{ deploy_key_path }}.pub"
+
+  tasks:
+    - name: Ensure SSH directory exists
+      ansible.builtin.file:
+        path: "{{ ansible_env.HOME }}/.ssh"
+        state: directory
+        owner: "{{ ansible_user_id }}"
+        mode: '0700'
+
+    - name: Check whether private key exists
+      ansible.builtin.stat:
+        path: "{{ deploy_key_path }}"
+      register: deploy_private_key
+
+    - name: Check whether public key exists
+      ansible.builtin.stat:
+        path: "{{ deploy_public_key_path }}"
+      register: deploy_public_key
+
+    - name: Ensure key pair is complete
+      ansible.builtin.assert:
+        that:
+          - deploy_private_key.stat.exists == deploy_public_key.stat.exists
+        fail_msg: >-
+          Only one key file exists. Inspect the existing files before
+          continuing. No existing key will be overwritten.
+
+    - name: Generate Ed25519 key pair if absent
+      ansible.builtin.command:
+        argv:
+          - ssh-keygen
+          - -t
+          - ed25519
+          - -N
+          - ""
+          - -C
+          - jenkins-inventory-system-readonly
+          - -f
+          - "{{ deploy_key_path }}"
+        creates: "{{ deploy_key_path }}"
+      when: not deploy_private_key.stat.exists
+
+    - name: Set private key permissions
+      ansible.builtin.file:
+        path: "{{ deploy_key_path }}"
+        owner: "{{ ansible_user_id }}"
+        mode: '0600'
+
+    - name: Set public key permissions
+      ansible.builtin.file:
+        path: "{{ deploy_public_key_path }}"
+        owner: "{{ ansible_user_id }}"
+        mode: '0644'
+
+    - name: Read public key
+      ansible.builtin.command:
+        argv:
+          - cat
+          - "{{ deploy_public_key_path }}"
+      register: deploy_public_key_content
+      changed_when: false
+
+    - name: Display public key
+      ansible.builtin.debug:
+        msg: "{{ deploy_public_key_content.stdout }}"
