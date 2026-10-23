@@ -2,6 +2,7 @@
 ---
 - name: Prepare GitHub deploy key on Jenkins server
   hosts: jenkins_servers
+  become: false
   gather_facts: true
 
   vars:
@@ -47,6 +48,7 @@
           - jenkins-inventory-system-readonly
           - -f
           - "{{ deploy_key_path }}"
+      args:
         creates: "{{ deploy_key_path }}"
       when: not deploy_private_key.stat.exists
 
